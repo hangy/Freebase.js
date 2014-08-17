@@ -142,17 +142,17 @@ test.grammar = [
 test.same_as_links = [
     ["http://www.geonames.org/6167865/", options,
         function(r) {
-            console.log(r.links.length > 3)
+            console.log(r && r.links && r.links.length > 3)
         }
     ],
     ["toronto", options,
         function(r) {
-            console.log(r.links.length > 3)
+            console.log(r && r.links && r.links.length > 3)
         }
     ],
     ["/m/0h7h6", options,
         function(r) {
-            console.log(r.links.length > 3)
+            console.log(r && r.links && r.links.length > 3)
         }
     ]
 ]
