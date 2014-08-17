@@ -382,7 +382,7 @@ freebase.same_as_links = function(q, options, callback) {
         }
         //get its formatted links from the topic api
         freebase.topic(result.result[0].mid, ps.options, function(all) {
-            if (fns.isempty(all)) {
+            if (fns.isempty(all) || fns.iserror(all)) {
                 return ps.callback([]);
             }
             var links = [];
@@ -651,7 +651,7 @@ freebase.is_a = function(q, options, callback) {
         return ps.callback({});
     }
     freebase.topic(ps.q, ps.options, function(r) {
-        if (fns.isempty(r)) {
+        if (fns.isempty(r) || fns.iserror(r)) {
             return ps.callback({});
         }
         var types = r.property["/type/object/type"] || {}

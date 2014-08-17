@@ -364,7 +364,7 @@ var fns = (function() {
     }
 
     fns.isempty = function(o) {
-        if (!o || typeof o != 'object') {
+        if (!o || typeof o !== 'object') {
             return true
         }
         if (Object.prototype.toString.call(o) !== '[object Array]' && Object.keys(o).length == 0) {
@@ -372,7 +372,10 @@ var fns = (function() {
         }
         return false
     }
-    // console.log(fns.isempty({sdf:2}))
+
+    fns.iserror = function(o) {
+        return !o || o.error;
+    }
 
     // export for Node.js
     if (typeof module !== 'undefined' && module.exports) {
