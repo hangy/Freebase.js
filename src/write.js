@@ -32,7 +32,7 @@ freebase.mqlwrite = function(query, options, callback) {
         console.log("=========")
         return
     }
-    var url = freebase.globals.host + 'mqlwrite?query=' + encodeURIComponent(JSON.stringify(query))
+    var url = freebase.globals.host + 'mqlwrite?query=' + encodeURIComponent(JSON.stringify(query)) + '&key=' + options.key;
     var obj = {
         url: url,
         headers: {

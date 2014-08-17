@@ -4,7 +4,7 @@
 if (typeof module !== 'undefined' && module.exports) {
     var freebase = require("./core");
     var http = require('./helpers/http');
-};
+}
 
 freebase.OAuth2 = function OAuth2(options, loadToken, storeToken) {
     this.options = options;
@@ -23,7 +23,6 @@ freebase.OAuth2.prototype.getAccessToken = function() {
 };
 
 freebase.OAuth2.prototype.isAccessTokenExpired = function() {
-return true;
     if (!this.token.expires_at) {
         return true;
     } else {
@@ -44,7 +43,7 @@ freebase.OAuth2.prototype.refreshAccessToken = function() {
     };
     var oauth2 = this;
 
-    var postData = Object.keys(body).reduce(function(a,k){a.push(k+'='+encodeURIComponent(body[k]));return a},[]).join('&');
+    var postData = Object.keys(body).reduce(function(a,k){a.push(k+'='+encodeURIComponent(body[k]));return a;},[]).join('&');
     http.post(url, postData, function(result) {
         if (!result.error) {
             oauth2.token.access_token = result.access_token;
@@ -65,5 +64,5 @@ freebase.OAuth2.prototype.calculateExpiryDate = function(createdAt) {
 };
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = freebase
+    module.exports = freebase;
 }
