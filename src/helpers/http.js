@@ -24,7 +24,7 @@ var http = (function() {
 			});
 		}
 
-		http.post = function(url, data, callback) {
+		http.post = function(url, data, callback, headers) {
 			callback = callback || defaultcallback;
 			$.post(url, data, function(result) {
 				callback(trytoparse(result))
@@ -51,13 +51,19 @@ var http = (function() {
 			})
 		}
 
-		http.post = function(url, data, callback) {
+		http.post = function(url, data, callback, headers) {
 			callback = callback || console.log;
+			headers = headers || {};
 			if (typeof data == 'object') {
 				data = JSON.stringify(data);
+				headers["Content-Type"] = "application/json";
+			} else {
+				headers["Content-Type"] = "application/x-www-form-urlencoded";
 			}
+
 			request({
-				url: 'http://api.freebase.com/api/service/mqlread',
+				url: url,
+				headers: headers,
 				method: 'POST',
 				body: data
 			}, function(err, res, body) {

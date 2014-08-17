@@ -19,6 +19,10 @@ freebase.mqlwrite = function(query, options, callback) {
         options = {};
     }
     options = options || {};
+    if (options.oauth2) {
+        options.oauth_token = options.oauth2.getAccessToken();
+    }
+
     options.oauth_token = options.oauth_token || options.access_token
     if (!options.oauth_token) {
         console.log("=========")

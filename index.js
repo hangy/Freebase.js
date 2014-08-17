@@ -7,6 +7,7 @@ var freebase = (function() {
             })
         }
         add_methods(require("./src/sugar"))
+        add_methods(require("./src/oauth2"));
         add_methods(require("./src/geo"))
         add_methods(require("./src/graph"))
         //these two aren't included on the clientside
