@@ -38,7 +38,7 @@ var url = oauth2Client.generateAuthUrl({
 	access_type: 'offline',
 	scope: 'https://www.googleapis.com/auth/freebase'
 });
-console.log('opening authentication url in your browser... ')
+console.log('opening authentication url ' + url + ' in your browser... ')
 open(url)
 console.log(" ")
 command_line_ask("  what is the 'code' from the resulting webpage: ", /.+/, function(code) {
