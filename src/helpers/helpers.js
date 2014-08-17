@@ -339,20 +339,17 @@ var fns = (function() {
             if (!url.match(/\?/)) { //pretty ugly
                 url += '?'
             }
+
             url += '&key=' + options.key;
         }
-        http.get(url, callback);
-    }
 
-    fns.post = function(query, options, callback) {
-        var body = 'query=' + JSON.stringify({
-            query: query,
-            key: options.key,
-            cursor: options.cursor
-        })
-        http.post('https://www.googleapis.com/freebase/v1/mqlread', body, callback);
+        var headers = { 'User-Agent': 'request' };
+        if (options.oauth_token) {
+            headers.Authorization = 'Bearer ' + options.oauth_token;
+        }
+
+        http.get(url, callback, headers);
     }
-    //fns.post([{"id":"/en/radiohead","name":null}],{},console.log)
 
     fns.isin = function(word, arr) {
         return arr.some(function(v) {

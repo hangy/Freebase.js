@@ -5,7 +5,6 @@ if (typeof module !== 'undefined' && module.exports) {
     var freebase = require("./core")
     var fns = require('./helpers/helpers');
     var async = require('async')
-    var request = require('request')
 }
 
 freebase.mqlwrite = function(query, options, callback) {
@@ -32,29 +31,27 @@ freebase.mqlwrite = function(query, options, callback) {
         console.log("=========")
         return
     }
-    var url = freebase.globals.host + 'mqlwrite?query=' + encodeURIComponent(JSON.stringify(query)) + '&key=' + options.key;
-    var obj = {
-        url: url,
-        headers: {
-            'User-Agent': 'request',
-            Authorization: "Bearer " + options.oauth_token
-        }
-    }
 
-    request(obj, function(err, r, p) {
+    var url = freebase.globals.host + 'mqlwrite?query=' + encodeURIComponent(JSON.stringify(query)) + '&key=' + options.key;
+    fns.http(url, options, function(err, r, p) {
         if (err) {
             console.log(err)
         }
 
-        var parsed = JSON.parse(p);
-        if (parsed.errors || parsed.error) {
-            return callback(null, err || parsed.errors || parsed.err);
-        } else {
-            return callback(parsed.result, err);
+        try
+        {
+            var parsed = JSON.parse(p);
+            if (parsed.errors || parsed.error) {
+                return callback(p, err || parsed.errors || parsed.err);
+            } else {
+                return callback(parsed.result, err);
+            }
+        } catch (e) {
+            return callback(p, e);
         }
     })
+};
 
-}
 freebase.add_type = function(topic, options, callback) {
     this.doc = "add a type to a freebase topic";
     callback = callback || console.log;

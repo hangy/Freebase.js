@@ -6,10 +6,14 @@ var http = (function() {
 	//client-side environment
 	if (typeof window != 'undefined' && window.screen) {
 
-		http.get = function(url, callback) {
+		http.get = function(url, callback, headers) {
 			callback = callback || defaultcallback;
-			$.get(url, function(result) {
-				callback(trytoparse(result))
+			$.ajax({
+				url: url,
+				headers: headers,
+				success: function(result) {
+					callback(trytoparse(result))
+				}
 			}).fail(function(e) {
 				callback(e.statusText || "error")
 			});
@@ -26,8 +30,14 @@ var http = (function() {
 
 		http.post = function(url, data, callback, headers) {
 			callback = callback || defaultcallback;
-			$.post(url, data, function(result) {
-				callback(trytoparse(result))
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: data,
+				headers: headers,
+				success: function(result) {
+					callback(trytoparse(result))
+				}
 			}).fail(function(e) {
 				callback(e.statusText || "error")
 			});
@@ -42,10 +52,11 @@ var http = (function() {
 	else if (typeof module !== 'undefined' && module.exports) {
 		var request = require('request');
 
-		http.get = function(url, callback) {
+		http.get = function(url, callback, headers) {
 			callback = callback || console.log;
 			request({
-				uri: url
+				uri: url,
+				headers: headers
 			}, function(error, response, body) {
 				callback(trytoparse(body))
 			})
