@@ -2,11 +2,11 @@
 
 // export for Node.js
 if (typeof module !== 'undefined' && module.exports) {
-    var freebase = require("../index");
+    var freebase = require("./core");
     var http = require('./helpers/http');
 };
 
-function OAuth2(options, loadToken, storeToken) {
+freebase.OAuth2 = function OAuth2(options, loadToken, storeToken) {
     this.options = options;
     loadToken = loadToken || function() { return {}; };
     this.storeToken = storeToken;
@@ -14,7 +14,7 @@ function OAuth2(options, loadToken, storeToken) {
     this.token.expires_at = this.token.expires_at || this.calculateExpiryDate();
 };
 
-OAuth2.prototype.getAccessToken = function() {
+freebase.OAuth2.prototype.getAccessToken = function() {
     if (this.isAccessTokenExpired()) {
         this.refreshAccessToken();
     }
@@ -22,7 +22,7 @@ OAuth2.prototype.getAccessToken = function() {
     return this.token;
 };
 
-OAuth2.prototype.isAccessTokenExpired = function() {
+freebase.OAuth2.prototype.isAccessTokenExpired = function() {
 return true;
     if (!this.token.expires_at) {
         return true;
@@ -34,7 +34,7 @@ return true;
     }
 };
 
-OAuth2.prototype.refreshAccessToken = function() {
+freebase.OAuth2.prototype.refreshAccessToken = function() {
     var url = 'https://accounts.google.com/o/oauth2/token';
     var body = {
         'refresh_token': this.token.refresh_token,
@@ -55,7 +55,7 @@ OAuth2.prototype.refreshAccessToken = function() {
     });
 };
 
-OAuth2.prototype.calculateExpiryDate = function(createdAt) {
+freebase.OAuth2.prototype.calculateExpiryDate = function(createdAt) {
     var d = createdAt || new Date();
     if (this.token.expires_in) {
         d.setSeconds(d.getSeconds() + this.token.expires_in);
@@ -64,4 +64,6 @@ OAuth2.prototype.calculateExpiryDate = function(createdAt) {
     return d;
 };
 
-freebase.OAuth2 = OAuth2;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = freebase
+}

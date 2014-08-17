@@ -2,7 +2,7 @@
 
 // export for Node.js
 if (typeof module !== 'undefined' && module.exports) {
-    var freebase = require("../index")
+    var freebase = require("./core")
     var fns = require('./helpers/helpers');
     var async = require('async')
     var request = require('request')

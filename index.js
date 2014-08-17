@@ -1,12 +1,12 @@
 var freebase = (function() {
 
         var freebase = require("./src/core")
-        freebase.OAuth2 = require("./src/oauth2");
         var add_methods = function(obj) {
             Object.keys(obj).forEach(function(k) {
                 freebase[k] = obj[k]
             })
         }
+        add_methods(require("./src/oauth2"))
         add_methods(require("./src/sugar"))
         add_methods(require("./src/geo"))
         add_methods(require("./src/graph"))
