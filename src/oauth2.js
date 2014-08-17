@@ -7,11 +7,15 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 freebase.OAuth2 = function OAuth2(options, loadToken, storeToken) {
-    this.options = options;
-    loadToken = loadToken || function() { return {}; };
-    this.storeToken = storeToken;
-    this.token = loadToken();
-    this.token.expires_at = this.token.expires_at || this.calculateExpiryDate();
+    if (this.constructor !== OAuth2) {
+        return new OAuth2(options, loadToken, storeToken);
+    } else {
+        this.options = options;
+        loadToken = loadToken || function() { return {}; };
+        this.storeToken = storeToken;
+        this.token = loadToken();
+        this.token.expires_at = this.token.expires_at || this.calculateExpiryDate();
+    }
 };
 
 freebase.OAuth2.prototype.getAccessToken = function() {

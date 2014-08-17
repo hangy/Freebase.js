@@ -12,7 +12,7 @@ module.exports = function(grunt) {
                 //minimum file
                 // src: ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/helpers.js', './src/core.js'],
                 //full file
-                src: ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/data.js', './src/helpers/helpers.js', './src/core.js', './src/sugar.js', './src/geo.js', './src/graph.js'],
+                src: ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/data.js', './src/helpers/helpers.js', './src/core.js', './src/sugar.js', './src/geo.js', './src/graph.js', './src/write.js', './src/oauth2.js'],
                 dest: './client_side/freebase.js'
             }
         },
