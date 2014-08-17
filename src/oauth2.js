@@ -63,3 +63,5 @@ OAuth2.prototype.calculateExpiryDate = function(createdAt) {
 
     return d;
 };
+
+freebase.OAuth2 = OAuth2;
