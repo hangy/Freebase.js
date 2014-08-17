@@ -20,7 +20,7 @@ freebase.mqlwrite = function(query, options, callback) {
     }
     options = options || {};
     if (options.oauth2) {
-        options.oauth_token = options.oauth2.getAccessToken();
+        options.oauth_token = options.oauth2.getAccessToken().access_token;
     }
 
     options.oauth_token = options.oauth_token || options.access_token
@@ -40,12 +40,18 @@ freebase.mqlwrite = function(query, options, callback) {
             Authorization: "Bearer " + options.oauth_token
         }
     }
+
     request(obj, function(err, r, p) {
         if (err) {
             console.log(err)
         }
-        var result = JSON.parse(p).result
-        return callback(result, err)
+
+        var parsed = JSON.parse(p);
+        if (parsed.errors || parsed.error) {
+            return callback(null, err || parsed.errors || parsed.err);
+        } else {
+            return callback(parsed.result, err);
+        }
     })
 
 }
