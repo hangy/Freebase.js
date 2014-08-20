@@ -1,6 +1,6 @@
 /*! freebase 
  by @spencermountain
- 2014-07-15 */
+ 2014-08-20 */
 /*! freebase.js 
  by @spencermountain
 	https://github.com/spencermountain/Freebase.js
@@ -17,10 +17,14 @@ var http = (function() {
 	//client-side environment
 	if (typeof window != 'undefined' && window.screen) {
 
-		http.get = function(url, callback) {
+		http.get = function(url, callback, headers) {
 			callback = callback || defaultcallback;
-			$.get(url, function(result) {
-				callback(trytoparse(result))
+			$.ajax({
+				url: url,
+				headers: headers,
+				success: function(result) {
+					callback(trytoparse(result))
+				}
 			}).fail(function(e) {
 				callback(e.statusText || "error")
 			});
@@ -35,10 +39,16 @@ var http = (function() {
 			});
 		}
 
-		http.post = function(url, data, callback) {
+		http.post = function(url, data, callback, headers) {
 			callback = callback || defaultcallback;
-			$.post(url, data, function(result) {
-				callback(trytoparse(result))
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: data,
+				headers: headers,
+				success: function(result) {
+					callback(trytoparse(result))
+				}
 			}).fail(function(e) {
 				callback(e.statusText || "error")
 			});
@@ -53,22 +63,29 @@ var http = (function() {
 	else if (typeof module !== 'undefined' && module.exports) {
 		var request = require('request');
 
-		http.get = function(url, callback) {
+		http.get = function(url, callback, headers) {
 			callback = callback || console.log;
 			request({
-				uri: url
+				uri: url,
+				headers: headers
 			}, function(error, response, body) {
 				callback(trytoparse(body))
 			})
 		}
 
-		http.post = function(url, data, callback) {
+		http.post = function(url, data, callback, headers) {
 			callback = callback || console.log;
+			headers = headers || {};
 			if (typeof data == 'object') {
 				data = JSON.stringify(data);
+				headers["Content-Type"] = "application/json";
+			} else {
+				headers["Content-Type"] = "application/x-www-form-urlencoded";
 			}
+
 			request({
-				url: 'http://api.freebase.com/api/service/mqlread',
+				url: url,
+				headers: headers,
 				method: 'POST',
 				body: data
 			}, function(err, res, body) {
@@ -94,6 +111,7 @@ var http = (function() {
 	return http;
 
 })()
+
 //if nodejs, load these modules
 if (typeof module !== 'undefined' && module.exports) {
     var data = require('./data.js').data;
@@ -435,20 +453,17 @@ var fns = (function() {
             if (!url.match(/\?/)) { //pretty ugly
                 url += '?'
             }
+
             url += '&key=' + options.key;
         }
-        http.get(url, callback);
-    }
 
-    fns.post = function(query, options, callback) {
-        var body = 'query=' + JSON.stringify({
-            query: query,
-            key: options.key,
-            cursor: options.cursor
-        })
-        http.post('https://www.googleapis.com/freebase/v1/mqlread', body, callback);
+        var headers = { 'User-Agent': 'request' };
+        if (options.oauth_token) {
+            headers.Authorization = 'Bearer ' + options.oauth_token;
+        }
+
+        http.get(url, callback, headers);
     }
-    //fns.post([{"id":"/en/radiohead","name":null}],{},console.log)
 
     fns.isin = function(word, arr) {
         return arr.some(function(v) {
@@ -463,7 +478,7 @@ var fns = (function() {
     }
 
     fns.isempty = function(o) {
-        if (!o || typeof o != 'object') {
+        if (!o || typeof o !== 'object') {
             return true
         }
         if (Object.prototype.toString.call(o) !== '[object Array]' && Object.keys(o).length == 0) {
@@ -471,7 +486,10 @@ var fns = (function() {
         }
         return false
     }
-    // console.log(fns.isempty({sdf:2}))
+
+    fns.iserror = function(o) {
+        return !o || o.error;
+    }
 
     // export for Node.js
     if (typeof module !== 'undefined' && module.exports) {
@@ -481,6 +499,7 @@ var fns = (function() {
     return fns;
 
 })()
+
 //By Spencer Kelly (@spencermountain)
 //https://github.com/spencermountain/Freebase-nodejs
 
