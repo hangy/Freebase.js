@@ -33,22 +33,12 @@ freebase.mqlwrite = function(query, options, callback) {
     }
 
     var url = freebase.globals.host + 'mqlwrite?query=' + encodeURIComponent(JSON.stringify(query)) + '&key=' + options.key;
-    fns.http(url, options, function(err, r, p) {
-        if (err) {
-            console.log(err)
-        }
-
-        try
-        {
-            var parsed = JSON.parse(p);
-            if (parsed.errors || parsed.error) {
-                return callback(p, err || parsed.errors || parsed.err);
-            } else {
-                return callback(parsed.result, err);
-            }
-        } catch (e) {
-            return callback(p, e);
-        }
+    fns.http(url, options, function(result) {
+      if (result.errors || result.error) {
+        return callback(result, result.errors || result.error);
+      } else {
+        return callback(result.result, null);
+      }
     })
 };
 
