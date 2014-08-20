@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<title>ATTAT</title>
+<link rel="import" href="imports/jquery.html">
+<link rel="import" href="imports/freebase.html">
+<link rel="import" href="imports/suggest.html">
+</head>
+
+<body>
+<h1><abbr title="Add A Type To A Topic">AATTAT</abbr></h1>
+<button id="authorize" tabindex="1">Authorize</button>
+
+<form id="add-type">
+  <label>
+    <span>Type</span>
+    <input id="type" placeholder="Type" type="text" tabindex="2" required autofocus>
+  </label>
+
+  <label>
+    <span>Topic</span>
+    <input id="topic" placeholder="Topic" type="text" tabindex="3" required>
+  </label>
+
+  <div>
+    <button name="submit" type="submit" id="add-type-submit">Add Type</button>
+  </div>
+</form>
+
+<script>
+$(document).ready(function(){
+  function getAccessToken() {
+    if (typeof(localStorage.token) !== 'undefined') {
+      var parsed = JSON.parse(localStorage.token);
+      if (parsed && parsed.access_token) {
+        return parsed;
+      } else {
+        return {};
+      }
+    } else {
+      return {};
+    }
+  }
+
+  function getNewToken() {
+    var redirectUrl = new URL('oauthcallback.html', window.location.href).href;
+    var win = window.open('https://accounts.google.com/o/oauth2/auth?response_type=token&redirect_uri=' + encodeURIComponent(redirectUrl) + '&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ffreebase&client_id=' + encodeURIComponent(CLIENT_ID), 'Freebase Authorization');
+    var timer = setInterval(function() {
+      if (win.closed !== false) {
+        window.clearInterval(timer);
+        $('#authorize').hide();
+      }
+    });
+  }
+
+  function initOAuth2() {
+    $.freebase.oauth2 = $.freebase.OAuth2({client_id: CLIENT_ID, client_secret: CLIENT_SECRET}, getAccessToken, saveAccessToken);
+  }
+
+  function saveAccessToken(token) {
+    localStorage.token = JSON.stringify(token);
+  }
+
+  $('#authorize').click(getNewToken);
+  $('#authorize').bind('hide', initOAuth2);
+  $('#authorize').bind('hide', function() { $('#add-type').show(); });
+  $('#authorize').bind('show', function() { $('#add-type').hide(); });
+
+  var token = getAccessToken();
+  if (!token || !token.access_token) {
+    $('#authorize').show();
+    $('#add-type').hide();
+  } else {
+    $('#authorize').hide();
+  }
+
+  function makeSuggest(element, type) {
+    element.suggest({ 'key': API_KEY, filter: '(all type:' + type + ')' });
+  }
+
+  makeSuggest($('#type'), '/type/type');
+  makeSuggest($('#topic'), '/common/topic');
+
+  $('#add-type').submit(function(event) {
+    $.freebase.add_type($('#topic').data('data.suggest').mid, { type: $('#type').data('data.suggest').mid, oauth2: $.freebase.oauth2, key: API_KEY}, function(r) {
+      $('body').append(r);
+    });
+    event.preventDefault();
+  });
+
+})
+</script>
+</body>
+</html>
