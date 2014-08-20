@@ -9,20 +9,22 @@ module.exports = function(grunt) {
                 footer: "\n\n return freebase; })()\n})(jQuery)"
             },
             dist: {
-                //minimum file
-                // src: ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/helpers.js', './src/core.js'],
-                //full file
-                src: ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/data.js', './src/helpers/helpers.js', './src/core.js', './src/sugar.js', './src/geo.js', './src/graph.js', './src/write.js', './src/oauth2.js'],
-                dest: './client_side/freebase.js'
-            }
+                files: {
+                    './client_side/core/freebase.js': ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/helpers.js', './src/core.js'],
+                    './client_side/freebase.js': ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/data.js', './src/helpers/helpers.js', './src/core.js', './src/sugar.js', './src/geo.js', './src/graph.js', './src/write.js', './src/oauth2.js']
+                },
+            },
         },
         uglify: {
-            do :{
-                src: ['./client_side/freebase.js'],
-                dest: './client_side/freebase.min.js'
-            }
-        }
-
+            static_mappings: {
+                files: [
+                    { src: ['./client_side/freebase.js'],
+                      dest: './client_side/freebase.min.js' },
+                    { src: ['./client_side/core/freebase.js'],
+                      dest: './client_side/core/freebase.min.js' },
+                ],
+            },
+        },
     });
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
