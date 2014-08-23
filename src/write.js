@@ -37,7 +37,7 @@ freebase.mqlwrite = function(query, options, callback) {
       if (result.errors || result.error) {
         return callback(result, result.errors || result.error);
       } else {
-        return callback(result.result, null);
+        return callback(result, null);
       }
     })
 };
