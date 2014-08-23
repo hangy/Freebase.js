@@ -34,8 +34,12 @@ freebase.mqlwrite = function(query, options, callback) {
 
     var url = freebase.globals.host + 'mqlwrite?query=' + encodeURIComponent(JSON.stringify(query)) + '&key=' + options.key;
     fns.http(url, options, function(result) {
-      if (result.errors || result.error) {
-        return callback(result, result.errors || result.error);
+      if (result.error) {
+        if (result.error.code === 401) {
+          this.token.expires_at = new Date(); // Authorization failed, consider token invalid.
+        }
+
+        return callback(result, result.error);
       } else {
         return callback(result, null);
       }
