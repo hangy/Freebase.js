@@ -5,13 +5,14 @@ before_script: grunt
 language: node_js
 install: npm install
 after_success: 
+- git remote set-url origin https://github.com/hangy/Freebase.js.git
 - git config credential.helper "store --file=.git/credentials"
 - echo "https://${GH_TOKEN}:@github.com" > .git/credentials
-- git add .
+- git add client_side
 - git config --global user.email "travis-ci@example.org"
 - git config --global user.name "Travis CI"
 - git commit -m "Travis CI build [skip ci]"
-- git push https://github.com/hangy/Freebase.js.git
+- git push
 env: 
   global: 
     secure: PDwUAEy+DhHDaN2nNSgN9xtll0hNXEcI/Grh9H4ACAVGIY+/GDI0JvcS4CZ3wPLxOEoygzFdYjHk3iZleS+KZ+HRRV9PDDN4bLW7IQ98fVkzse64CmZhUnMMfBCsN5dPmdPDqz7PWZBaxMq5FuYyFbOU/37CP+fVcLgj80QcIak=
