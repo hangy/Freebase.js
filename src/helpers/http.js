@@ -8,9 +8,6 @@ var http = (function() {
 
 		http.get = function(url, callback, headers) {
 			callback = callback || defaultcallback;
-			headers = headers || {};
-			headers['If-Modified-Since'] = 'Foobar';
-			headers['If-None-Match'] = 'Foobar';
 			$.ajax({
 				url: url,
 				headers: headers,
@@ -33,9 +30,6 @@ var http = (function() {
 
 		http.post = function(url, data, callback, headers) {
 			callback = callback || defaultcallback;
-			headers = headers || {};
-			headers['If-Modified-Since'] = 'Foobar';
-			headers['If-None-Match'] = 'Foobar';
 			$.ajax({
 				type: "POST",
 				url: url,
