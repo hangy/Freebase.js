@@ -36,6 +36,7 @@ freebase.mqlwrite = function(query, options, callback) {
     fns.http(url, options, function(result) {
       if (result.error) {
         if (result.error.code === 401) {
+          this.token = this.token || {};
           this.token.expires_at = new Date(); // Authorization failed, consider token invalid.
         }
 
