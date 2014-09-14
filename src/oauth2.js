@@ -30,8 +30,10 @@ freebase.OAuth2CodeAuthorizationFlowStrategy.prototype.refreshToken = function(o
         if (!result.error) {
             oauth2.token.access_token = result.access_token;
             oauth2.token.expires_in = result.expires_in;
-            oauth2.token.expires_at = oauth2.calculateExpiryDate();
+            oauth2.token.expires_at = oauth2.calculateExpiryDate(new Date());
             oauth2.storeToken(oauth2.token);
+        } else {
+            throw result.error;
         }
     });
 }
@@ -69,12 +71,16 @@ freebase.OAuth2.prototype.isAccessTokenExpired = function() {
 };
 
 freebase.OAuth2.prototype.calculateExpiryDate = function(createdAt) {
-    var d = createdAt || new Date();
-    if (this.token.expires_in) {
+    if (createdAt && this.token.expires_in) {
+        var d = new Date(createdAt);
         d.setSeconds(d.getSeconds() + this.token.expires_in);
+        return d;
     }
 
-    return d;
+    // Not enough information about expire - assume immediate invalidity.
+    var n = new Date();
+    n.setSeconds(n.getSeconds() - 1);
+    return n;
 };
 
 if (typeof module !== 'undefined' && module.exports) {
