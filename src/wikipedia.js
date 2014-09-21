@@ -283,18 +283,26 @@ freebase.wikipedia_to_freebase = function(q, options, callback) {
  
     var regex = /^https?:\/\/([a-z]+)\.wikipedia\.org\/wiki\/(.*)/;
     var match = regex.exec(ps.q);
-
-    var lang = match[1];
-    var title = decodeURIComponent(match[2]);
-    var obj = {
-        id: "/wikipedia/" + lang + "/" + freebase.mql_encode(title),
-        name: title
+    if (match) {
+        var lang = match[1];
+        var title = decodeURIComponent(match[2]);
+        var obj = {
+            id: "/wikipedia/" + lang + "/" + freebase.mql_encode(title),
+            name: title
+        };
+        return ps.callback(obj)
+    } else {
+        ps.q = ps.q.replace(/^https?:\/\/..\.wikipedia\.org\/wiki\//, '');
+        var title = ps.q;
+        var obj = {
+            id: "/wikipedia/en/" + freebase.mql_encode(ps.q),
+            name: title
+        };
+        return ps.callback(obj);
     }
-    return ps.callback(obj)
 }
 // freebase.wikipedia_to_freebase("Tony Hawk")
-
-
+// freebase.wikipedia_to_freebase("http://ru.wikipedia.org/wiki/%D0%A5%D0%BE%D1%83%D0%BA%2C_%D0%A2%D0%BE%D0%BD%D0%B8");
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = freebase
