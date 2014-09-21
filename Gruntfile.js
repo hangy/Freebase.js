@@ -11,7 +11,7 @@ module.exports = function(grunt) {
             dist: {
                 files: {
                     './client_side/core/freebase.js': ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/helpers.js', './src/core.js'],
-                    './client_side/freebase.js': ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/data.js', './src/helpers/helpers.js', './src/core.js', './src/sugar.js', './src/geo.js', './src/graph.js', './src/write.js', './src/oauth2.js']
+                    './client_side/freebase.js': ['./src/helpers/grunt_header.js', './src/helpers/http.js', './src/helpers/data.js', './src/helpers/helpers.js', './src/core.js', './src/sugar.js', './src/geo.js', './src/graph.js', './src/write.js', './src/oauth2.js', './src/wikipedia.js']
                 },
             },
         },

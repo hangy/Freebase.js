@@ -280,10 +280,14 @@ freebase.wikipedia_to_freebase = function(q, options, callback) {
     if (!ps.valid) {
         return ps.callback({});
     }
-    ps.q = ps.q.replace(/^https?:\/\/..\.wikipedia\.org\/wiki\//, '');
-    var title = ps.q;
+ 
+    var regex = /^https?:\/\/([a-z]+)\.wikipedia\.org\/wiki\/(.*)/;
+    var match = regex.exec(ps.q);
+
+    var lang = match[1];
+    var title = decodeURIComponent(match[2]);
     var obj = {
-        id: "/wikipedia/en/" + freebase.mql_encode(ps.q),
+        id: "/wikipedia/" + lang + "/" + freebase.mql_encode(title),
         name: title
     }
     return ps.callback(obj)
