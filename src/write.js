@@ -5,6 +5,7 @@ if (typeof module !== 'undefined' && module.exports) {
     var freebase = require("./core")
     var fns = require('./helpers/helpers');
     var async = require('async')
+    var sleep = require('sleep');
 }
 
 freebase.mqlwrite = function(query, options, callback) {
@@ -35,9 +36,8 @@ freebase.mqlwrite = function(query, options, callback) {
     var url = freebase.globals.host + 'mqlwrite?query=' + encodeURIComponent(JSON.stringify(query)) + '&key=' + options.key;
     fns.http(url, options, function(result) {
       if (result.error) {
-        if (result.error.code === 401) {
-          this.token = this.token || {};
-          this.token.expires_at = new Date(); // Authorization failed, consider token invalid.
+        if (result.error.code === 401 && options.oauth2) {
+          options.oauth2.onAccessTokenInvalid(); // Authorization failed, consider token invalid.
         }
 
         return callback(result, result.error);
@@ -134,11 +134,12 @@ freebase.filter = function(list, options, callback) {
     })
 
     var doit = function(query, cb) {
+        sleep.sleep(1);
         freebase.mqlread(query, options, function(r) {
             cb(null, r.result)
         })
     }
-    async.mapLimit(queries, 5, doit, function(err, all) {
+    async.mapLimit(queries, 1, doit, function(err, all) {
         var goods = all.filter(function(r) {
             return r
         })
@@ -227,7 +228,7 @@ freebase.write_async = function(topics, options, callback) {
             cb(err, result)
         })
     }
-    async.mapLimit(queries, 5, write_it, function(err, all) {
+    async.mapLimit(queries, 1, write_it, function(err, all) {
         callback(all)
     })
 

@@ -51,6 +51,10 @@ freebase.OAuth2 = function OAuth2(options, loadToken, storeToken, strategy) {
     }
 };
 
+freebase.OAuth2.prototype.onAccessTokenInvalid = function() {
+    this.token.expires_at = new Date();
+};
+
 freebase.OAuth2.prototype.getAccessToken = function() {
     if (this.isAccessTokenExpired() && this.strategy && this.strategy.canRefreshToken(this)) {
         this.strategy.refreshToken(this);

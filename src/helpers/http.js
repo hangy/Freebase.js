@@ -15,7 +15,7 @@ var http = (function() {
 					callback(trytoparse(result))
 				}
 			}).fail(function(e) {
-				callback(e.statusText || "error")
+				callback({ error: { code: e.status, message: e.statusText }});
 			});
 		}
 
