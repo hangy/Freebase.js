@@ -95,6 +95,7 @@ freebase.test_writes = function(token) {
 
 //accept a list of topics and ensure they meet demands
 freebase.filter = function(list, options, callback) {
+    list=list||[]
     options = options || {}
     options.filter = options.filter || {}
     //build query
@@ -201,6 +202,7 @@ freebase.filter = function(list, options, callback) {
 
 
 freebase.write_async = function(topics, options, callback) {
+    topics= topics || []
     options = options || {}
     options.write = options.write || {}
     options.connect = options.connect || "insert"
@@ -237,21 +239,6 @@ freebase.write_async = function(topics, options, callback) {
 
 
 
-//cross-reference wikipedia+freebase data
-freebase.garden = function(cat, options, callback) {
-
-    freebase.from_category(cat, options, function(all) {
-        freebase.filter(all, options, function(list) {
-            if (!options.write) {
-                return callback(list)
-            }
-            freebase.write_async(list, options, function(result) {
-                callback(result)
-            })
-        })
-    })
-
-}
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = freebase
