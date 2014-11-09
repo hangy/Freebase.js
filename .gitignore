@@ -1,0 +1,6 @@
+node_modules/
+
+client_side/core/freebase.js
+client_side/core/freebase.min.js
+client_side/freebase.js
+client_side/freebase.min.js

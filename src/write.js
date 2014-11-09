@@ -4,8 +4,7 @@
 if (typeof module !== 'undefined' && module.exports) {
     var freebase = require("./core")
     var fns = require('./helpers/helpers');
-    var async = require('async')
-    var sleep = require('sleep');
+    var async = require('async');
 }
 
 freebase.mqlwrite = function(query, options, callback) {
@@ -135,7 +134,6 @@ freebase.filter = function(list, options, callback) {
     })
 
     var doit = function(query, cb) {
-        sleep.sleep(1);
         freebase.mqlread(query, options, function(r) {
             cb(null, r.result)
         })
