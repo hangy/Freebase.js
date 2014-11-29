@@ -31,7 +31,7 @@ the paramaters are lazy, if you're lazy.
 
 [![Video Demo](http://i.vimeocdn.com/video/81314153_640.jpg)](https://vimeo.com/13992710)
 
-## In the friggin broswer
+## In the friggin browser
 [Demo](https://rawgit.com/spencermountain/Freebase.js/master/client_side/demo.html)  - freebase_core.js == 16 kb,  freebase.js == 16kb
 ```javascript
   <script src="http://code.jquery.com/jquery-latest.js"></script>
@@ -67,6 +67,24 @@ You'll need to get a new token after about 3 hours.
 
 (Be careful not to commit your credentials.)
 
+##Documentation
+Each method takes the following form:
+    freebase.method( "query",   {options},  callback()  )
+it supports this form:
+    freebase.method( "query",  callback()  )
+and also this form, where the callback defaults to console.log()
+    freebase.method( "query" )
+
+here are some options that you can ship in to any method:
+````javascript
+{
+  nodeCallback: true, // use the 'error-first' callback form -> callback(error, result){}
+  key: "MY_API_KEY", // good idea to include your freebase key, to avoid errors
+  limit: 2, // truncate results
+  debug: true, // print out the urls being fetched
+}
+````
+
 ### Basic methods
 
 ####MQLread API
@@ -81,6 +99,7 @@ Books about planets:
                }]​
     freebase.mqlread(query, {}, function(r){console.log(r)})
 ```
+the options object will ship [any paramaters](https://developers.google.com/freebase/v1/mql-overview) to the freebase api.
 
 ####Pagination
 Every Tornado, ever
@@ -91,6 +110,7 @@ Every Tornado, ever
              }]
       freebase.paginate(query, {max:400})
 ```
+
 ####Search API
 [search api documentation](https://developers.google.com/freebase/v1/search-overview)
 
@@ -98,6 +118,8 @@ Hockey players named 'doug'
 ```javascript
     freebase.search("doug",{type: "/ice_hockey/hockey_player"})
 ```
+the options object will ship [any paramaters](https://developers.google.com/freebase/v1/search) to the freebase search api.
+
 ####Description API
 First paragraph of a topic's wikipedia article:
 ```javascript

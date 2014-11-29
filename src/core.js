@@ -7,6 +7,7 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 var freebase = (function() {
+    "use strict";
 
     var freebase = {};
 
@@ -34,26 +35,28 @@ var freebase = (function() {
         this.doc = "interface to freebase's mql api";
         this.reference = "http://wiki.freebase.com/wiki/MQL";
         callback = callback || console.log;
-        if (!query) {
-            return callback({})
-        }
         if (typeof options == "function") {
             callback = options;
             options = {};
-        } //flexible parameter
+        } //flexible parameters
+        if (!query) {
+            return options.nodeCallback ? callback(null, {}) : callback({})
+        }
         options = options || {};
         options.uniqueness_failure = options.uniqueness_failure || "soft";
         options.cursor = options.cursor || "";
         var url = freebase.globals.host + 'mqlread?query=' + JSON.stringify(query) + "&cursor=" + options.cursor
-        if (options.dateline) {
-            url += "&dateline=" + dateline;
+        //options object contains some cruft, but we can still splat it onto the url
+        var params = fns.set_params(options)
+        url+="&"+params
+        if (options.debug) {
+            console.log(url)
         }
-
         fns.http(url, options, function(result) {
             if (result && result.error) {
                 console.log(JSON.stringify(result.error, null, 2));
             }
-            return callback(result)
+            return options.nodeCallback ? callback(null, result) : callback(result)
         })
     }
     // freebase.mqlread([{id:"/en/radiohead",name:null}])
@@ -89,12 +92,16 @@ var freebase = (function() {
             return freebase.lookup_id(ps.q, ps.options, ps.callback)
         }
         ps.options.query = encodeURIComponent(ps.q);
+        //the options object has some cruft to remove
         delete ps.options.property
         delete ps.options.strict
         var params = fns.set_params(ps.options)
         var url = freebase.globals.host + 'search/?' + params;
         if (ps.options.type == "/type/type" || ps.options.type == "/type/property") {
             url += "&scoring=schema&stemmed=true"
+        }
+        if(ps.options.debug){
+            console.log(url)
         }
         fns.http(url, ps.options, function(result) {
             if (!result || !result.result || !result.result[0]) {
@@ -145,7 +152,9 @@ var freebase = (function() {
         if (ps.options.type == "/type/type" || ps.options.type == "/type/property") {
             url += "&scoring=schema&stemmed=true"
         }
-
+        if (ps.options.debug) {
+            console.log(url)
+        }
         return fns.http(url, ps.options, function(result) {
             if (!result || !result.result || !result.result[0]) {
                 return ps.callback({})
@@ -177,6 +186,8 @@ var freebase = (function() {
     // freebase.lookup("/m/01sh40")
     //freebase.search("/en/radiohead")
     // freebase.lookup("pulp fiction")
+    // freebase.lookup('australia',{type:"/location/location", debug:true})
+
 
     freebase.lookup_id = function(q, options, callback) {
         this.doc = "generic info for an id";
@@ -219,6 +230,9 @@ var freebase = (function() {
         var output = fns.clone(freebase.globals.generic_query);
         var url = freebase.globals.host + 'search?type=/common/topic&limit=1&query=' + encodeURIComponent(ps.q);
         url += "&mql_output=" + encodeURIComponent(JSON.stringify(output));
+        if (ps.options.debug) {
+            console.log(url)
+        }
         fns.http(url, ps.options, function(result) {
             if (!result || !result.result) {
                 return ps.callback({})
@@ -286,6 +300,9 @@ var freebase = (function() {
             }
             ps.options.filter = ps.options.filter || 'all'
             var url = freebase.globals.host + 'topic' + id + '?' + fns.set_params(ps.options)
+            if (ps.options.debug) {
+                console.log(url)
+            }
             fns.http(url, ps.options, function(result) {
                 return ps.callback(result)
             })
@@ -311,13 +328,13 @@ var freebase = (function() {
             options.cursor = cursor || ""
             freebase.mqlread(query, options, function(result) {
                 if (!result || !result.result) {
-                    return callback(all);
+                    return options.nodeCallback ? callback(null, all) : callback(all)
                 }
                 all = all.concat(result.result);
                 if (result.cursor && (!options.max || all.length < options.max)) {
                     iterate(result.cursor)
                 } else {
-                    return callback(all)
+                    return options.nodeCallback ? callback(null, all) : callback(all)
                 }
             })
         }
@@ -368,7 +385,7 @@ var freebase = (function() {
         }
         freebase.get_id(ps.q, ps.options, function(topic) {
             if (!topic || !topic.id) {
-                return ps.callback("")
+                return options.nodeCallback ? ps.callback(null, "") : ps.callback("")
             }
             var query = [{
                 "id": topic.id,
@@ -380,14 +397,14 @@ var freebase = (function() {
             }]
             freebase.mqlread(query, ps.options, function(result) {
                 if (!result || !result.result || !result.result[0]) {
-                    return ps.callback({})
+                    return options.nodeCallback ? ps.callback(null, {}) : ps.callback({})
                 }
                 var key = fns.mql_unencode(result.result[0].key.value)
                 var obj = {
                     html: 'http://dbpedia.org/page/' + key,
                     json: 'http://dbpedia.org/data/' + key + '.json',
                 }
-                return ps.callback(obj)
+                return options.nodeCallback ? ps.callback(null, obj) : ps.callback(obj)
             })
         })
     }
@@ -433,17 +450,18 @@ var freebase = (function() {
             return fns.doit_async(ps);
         }
         if (!ps.valid) {
-            return ps.callback({});
+            return options.nodeCallback ? ps.callback(null, {}) : ps.callback({})
         }
         freebase.get_id(ps.q, ps.options, function(topic) {
             var id = topic.id;
             if (!id) {
-                return ps.callback({})
+                return options.nodeCallback ? ps.callback(null, {}) : ps.callback({})
             }
             ps.options.filter = ps.options.filter || 'all'
             var url = freebase.globals.host + "rdf" + id;
             fns.softget(url, ps.options, function(result) {
-                return ps.callback(result || '')
+                result= result||''
+                return options.nodeCallback ? ps.callback(null, result) : ps.callback(result)
             })
         })
     }
@@ -467,6 +485,9 @@ var freebase = (function() {
                 return ps.callback("")
             }
             var url = freebase.globals.host + 'text' + topic.id;
+            if (ps.options.debug) {
+                console.log(url)
+            }
             fns.http(url, ps.options, function(result) {
                 if (!result.result) {
                     return ps.callback('')
@@ -527,22 +548,23 @@ var freebase = (function() {
             return fns.doit_async(ps);
         }
         if (!ps.valid) {
-            return ps.callback({});
+            return ps.options.nodeCallback ? ps.callback(null, {}) : ps.callback({})
         }
         freebase.topic(ps.q, {
             filter: "/common/topic/notable_types"
         }, function(result) {
             if (!result || !result.property || !result.property['/common/topic/notable_types']) {
-                return ps.callback({})
+                return ps.options.nodeCallback ? ps.callback(null, {}) : ps.callback({})
             }
             var notable = result.property['/common/topic/notable_types'] || {
                 values: []
             };
             notable.values[0].name = notable.values[0].text;
-            return ps.callback(notable.values[0])
+            var result=notable.values[0]
+            return ps.options.nodeCallback ? ps.callback(null, result) : ps.callback(result)
         });
     }
-    // freebase.notable("toronto maple leafs")
+    // freebase.notable("toronto maple leafs", {nodeCallback:true})
 
 
     freebase.documentation = function(f, options, callback) {
@@ -592,3 +614,6 @@ var freebase = (function() {
     return freebase;
 
 })()
+// q=[{id:"/en/radiohead",name:null}]
+// freebase.mqlread(q, {cost:true, html_escape:false, debug:true,dinosaur:"yessir"}, function(r){console.log(r)})
+// freebase.search("tony hawk", {debug:true, dinosaur:"yessir"}, function(r){console.log(r)})
